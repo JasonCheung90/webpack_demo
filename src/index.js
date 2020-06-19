@@ -1,19 +1,27 @@
 import './index.css'
-import $ from 'jquery'
-import React, {Component} from 'react'
-import ReactDOM, {render} from 'react-dom'
+import React from 'react'
+import ReactDOM from 'react-dom'
 
 // webpack模块懒加载
-import(/* webpackChunkName: 'addition'*/ "./add").then(result => {
-  console.log(result.add(1,5)) 
+import(/* webpackChunkName: 'addition'*/ './add').then( (result) => {
+  console.log(result.add(1, 5))
 })
 
- console.log(React, Component, ReactDOM, render, 'hell dll');
+// eslint-disable-next-line require-jsdoc
+async function getLodash() {
+  const {default: _} = await import(/* webpackChunkName: 'lodash' */ 'lodash')
+  const res = _.join('[a,b,c,d,e]', '~')
+  console.log(res)
+}
 
-let nOBJ = Object.assign({age: 18}, {job: "web"})
+getLodash()
+
+console.log(React, ReactDOM);
+
+const nOBJ = Object.assign({age: 18}, {job: 'drive'})
 console.log(nOBJ);
 
-let arr = [5125,54,15,12154]
-for (let item of arr.keys()) {
+const arr = [5125, 54, 15, 12154]
+for (const item of arr.keys()) {
   console.log(item);
 }
