@@ -1,7 +1,9 @@
 const path = require('path')
 const HtmlWebpakPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const {CleanWebpackPlugin} = require('clean-webpack-plugin')
+const {
+  CleanWebpackPlugin
+} = require('clean-webpack-plugin')
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin')
 module.exports = {
   entry: {
@@ -32,13 +34,22 @@ module.exports = {
   ],
   module: {
     noParse: /jquery|lodash/,
-    rules: [
-      {test: /\.css$/,
+    rules: [{
+        test: /\.css$/,
         use: [
           MiniCssExtractPlugin.loader,
           'css-loader',
           'postcss-loader',
         ],
+      },
+      {
+        enforce: 'pre',
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'eslint-loader',
+        options: {
+          fix: true
+        }
       },
       {
         test: /\.js$/,
@@ -48,17 +59,15 @@ module.exports = {
       },
       {
         test: /\.(png|jpg|jpeg|gif|ico)$/i,
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              limit: 3*1024,
-              name: '[name]-[hash:5].[ext]',
-              outputPath: 'images/',
-              publicPath: '../images',
-            },
+        use: [{
+          loader: 'url-loader',
+          options: {
+            limit: 3 * 1024,
+            name: '[name]-[hash:5].[ext]',
+            outputPath: 'images/',
+            publicPath: '../images',
           },
-        ],
+        }, ],
       },
     ],
   },
