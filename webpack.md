@@ -10,15 +10,17 @@
 5. mode      --- 模式
 6. devServer --- 服务器
 7. resolve   --- 解析
+8. 安装 npm i webpack webpack-cli webpack-dev-server -D
 
 ## 编译es6
 
  Babel 的插件分为两类：转换插件和语法解析插件：
+ npm i babel-loader @babel/core @babel/preset-env @babel/plugin-transform-runtime -D
+ npm i @babel/runtime
 
- 1. babel-loader        ---         负责es6语法转化，比如：箭头函数
- 2. babel-preset-env    ---         包含es6、7、8等版本的语法转化规则
- 3. babel-plugin-transform-runtime --- 避免polyfill污染全局变量 最好使用这个
- 4. babel-polyfill      ---         全局使用es6内置方法和函数转化垫片 负责内置方法>和函数 比如 new Set()
+ 1. @babel/loader        ---         负责es6语法转化，比如：箭头函数
+ 2. @babel/preset-env    ---         包含es6、7、8等版本的语法转化规则
+ 3. @babel/plugin-transform-runtime --- 避免polyfill污染全局变量 最好使用这个
 
 ## 多页面的公共代码提取
 
@@ -43,17 +45,7 @@
         }
     }
 
-## 单页面的代码分割和懒加载
-
-1. import().then()      --  返回一个promise对象  推荐使1
-2. require.ensure()
-
-    import(/*webpackChunkName:'subA'*/ './subA')
-    .then(res => console.log(res))
-
-## 处理css
-
-1. 优化压缩JS terser-webpack-plugin
+    优化压缩JS terser-webpack-plugin
 
     new TerserPlugin({
     // 使用 cache，加快二次构建速度
@@ -73,26 +65,23 @@
             }
         }
     })
-2. 将css代码抽离压缩 处理未来的css
 
-    use:[
-        MiniCssExtractPlugin.loader,
-        {
-            loader:'css-loader',
-        },
-        {
-            loader:'postcss-loader',
-            options: {
-                ident:'postcss',
-                plugins:[
-                    require('postcss-cssnext')(),
-                    require('cssnano')(),
-                ]
-            }
-        }
-    ]
+    作用域提升（Scope Hoisting）是指 webpack 通过 ES6 语法的静态分析，分析出模块之间的依赖关系，尽可能地把模块放到同一个函数中
+     optimization: {
+        concatenateModules: true
+    }
 
-3. 将css代码从index.bundle.js提取出来
+## 单页面的代码分割和懒加载
+
+1. import().then()      --  返回一个promise对象  推荐使1
+2. require.ensure()
+
+    import(/*webpackChunkName:'subA'*/ './subA')
+    .then(res => console.log(res))
+
+## 处理css
+
+1. 将css代码从index.bundle.js提取出来
 
     plugins: [
             new MiniCssExtractPlugin({
@@ -100,23 +89,11 @@
             })
         ]
 
-4. 压缩css  ---    npm i optimize-css-assets-webpack-plugin -D
+2. 压缩css  ---    npm i optimize-css-assets-webpack-plugin -D
     optimization: {
         minimizer: [ new OptimizeCSSAssetsPlugin()],
-    },
-    plugins: [
-            new MiniCssExtractPlugin({
-                name:'[name].css',
-                chunkFilename:'[id].css'
-            }),
-            new PurifyCssPlugin(
-                {
-                    paths:glob.sync(path.join(__dirname , './dist/*.html'))
-                }
-            )
-        ]
-
-5. url-loader  --- file-loader  --- 处理图片
+    }
+3. url-loader  --- file-loader  --- 处理图片
 
     {
         test:/\.(jpe?g|png|gif|svg)$/i,
@@ -133,7 +110,7 @@
         ]
     }
 
-6. postcss-sprites  ---   生成雪碧图
+4. postcss-sprites  ---   生成雪碧图
     {
         loader:'postcss-loader',
         options: {
@@ -149,7 +126,7 @@
         }
     }
 
-7. file-loader --- 打包字体
+5. file-loader --- 打包字体
     {
         test:/\.(woff|woff2|eot|ttf|otf)$/,
         use:[
@@ -164,14 +141,7 @@
         ]
     }
 
-8. 使用webpack内置插件处理第三方库
-    plugins:[
-        new webpack.ProvidePlugin({
-                $:'jquery',
-            })
-    ]
-
-9. 使用 CleanWebpackPlugin HtmlWebpackPlugin 自动生成html
+6. 使用 CleanWebpackPlugin HtmlWebpackPlugin 自动生成html
 
     new CleanWebpackPlugin(),
 
@@ -184,7 +154,7 @@
                 }
             })
 
-10. 使用html-loader 引入图片
+7. 使用html-loader 引入图片
     {
         test:/\.html$/,
         use:[
@@ -197,17 +167,17 @@
         ]
     }
 
-11. webpack --profile --json > stats.json 生成结果分析文件
+8. webpack --profile --json > stats.json 生成结果分析文件
      在 <http://webpack.github.io/analyse/> 里面查看
 
-12. webpack-bundle-analyzer  --第三方打包结果分析
+9. webpack-bundle-analyzer  --第三方打包结果分析
 
     const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
     plugins:[
         new BundleAnalyzerPlugin()
     ]
-13. 设置服务器
+10. 设置服务器
 
     new webpack.HotModuleReplacementPlugin(),
 
@@ -225,16 +195,3 @@
             } */
     },
     devtool:'source-map',
-
-14. 安装 webpack
-    npm i webpack webpack-cli -D
-
-15. 处理JS
-    npm i babel-loader @babel/core @babel/preset-env @babel/plugin-transform-runtime -D
-
-    npm i @babel/runtime
-
-    作用域提升（Scope Hoisting）是指 webpack 通过 ES6 语法的静态分析，分析出模块之间的依赖关系，尽可能地把模块放到同一个函数中
-     optimization: {
-        concatenateModules: true
-    }
